@@ -40,6 +40,7 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
     columnChart = new ColumnChart({ link });
 
     const columnLink = columnChart.element.querySelector('.column-chart__link');
+    document.body.append(columnChart.element); //otherwise toBeVisible() check is not passed
 
     expect(columnLink).toBeVisible();
   });
