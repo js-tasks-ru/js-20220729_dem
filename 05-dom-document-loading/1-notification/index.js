@@ -1,9 +1,9 @@
 export default class NotificationMessage {
-  static notificationElements = [];
+  static currentNotification;
 
   constructor(
     message = "",
-    {duration = 1000, type = 'success'} = {duration: 1000, type: 'success'}) {
+    {duration = 1000, type = 'success'} = {}) {
     this.message = message;
     this.duration = duration;
     this.type = type;
@@ -33,10 +33,10 @@ export default class NotificationMessage {
   }
 
   show(parent = document.body) {
-    while (NotificationMessage.notificationElements.length) {
-      NotificationMessage.notificationElements.shift().remove();
+    if (NotificationMessage.currentNotification) {
+      NotificationMessage.currentNotification.remove();
     }
-    NotificationMessage.notificationElements.push(this.element);
+    NotificationMessage.currentNotification = this.element;
     parent.append(this.element);
     setTimeout(() => this.remove(), this.duration);
   }

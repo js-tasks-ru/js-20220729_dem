@@ -16,20 +16,24 @@ export default class SortableTable {
       if (template) {
         return template(this.data);
       } else {
-        return `
-            <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}">
-              <span>${title}</span>
-              <span data-element="arrow" class="sortable-table__sort-arrow">
-                <span class="sort-arrow"></span>
-              </span>
-            </div>
-          `;
+        return this.cellTemplate(id, sortable, title);
       }
     }).join('\n')}
     </div>
 
     <div data-element="body" class="sortable-table__body">
       ${this.bodyTemplate}
+    </div>
+    `;
+  }
+
+  cellTemplate(id, sortable, title) {
+    return `
+    <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}">
+      <span>${title}</span>
+      <span data-element="arrow" class="sortable-table__sort-arrow">
+        <span class="sort-arrow"></span>
+      </span>
     </div>
     `;
   }
@@ -65,7 +69,7 @@ export default class SortableTable {
   }
 
   sort(fieldValue, orderValue) {
-    for (let headerCell of this.subElements.header.children) {
+    for (const headerCell of this.subElements.header.children) {
       if (headerCell.dataset.id === fieldValue) {
         headerCell.dataset.order = orderValue;
       } else {
