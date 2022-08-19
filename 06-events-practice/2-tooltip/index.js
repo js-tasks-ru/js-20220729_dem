@@ -15,9 +15,10 @@ class Tooltip {
   }
 
   pointerOver = (event) => {
-    if (event.target.dataset.tooltip) {
+    const tooltipElement = event.target.closest("[data-tooltip]");
+    if (tooltipElement) {
       document.addEventListener('pointermove', this.pointerMove);
-      this.tooltipText = event.target.dataset.tooltip;
+      this.tooltipText = tooltipElement.dataset.tooltip;
       this.render(event.clientX, event.clientY);
     }
   };
