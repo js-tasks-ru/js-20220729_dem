@@ -4,7 +4,7 @@
  * @returns {function} - function-getter which allow get value from object by set path
  */
 export function createGetter(path) {
-  let subGetter = (obj, subPath) => {
+  const subGetter = (obj, subPath) => {
     if (subPath.length && obj) {
       return subGetter(obj[subPath[0]], subPath.slice(1));
     } else {
