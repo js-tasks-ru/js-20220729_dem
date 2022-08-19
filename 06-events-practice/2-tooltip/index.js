@@ -1,7 +1,6 @@
 class Tooltip {
   static instance;
-  static deltaX = 10;
-  static deltaY = 10;
+  static shift = 10;
 
   constructor() {
     if (!Tooltip.instance) {
@@ -12,48 +11,48 @@ class Tooltip {
 
   initialize() {
     document.addEventListener('pointerover', this.pointerOver);
-    document.addEventListener('pointermove', this.pointerMove);
     document.addEventListener('pointerout', this.pointerOut);
   }
 
-  pointerOver = function (event) {
+  pointerOver = (event) => {
     if (event.target.dataset.tooltip) {
-      console.log(`point over ${event.target.textContent}`);
-      console.log(`point over ${event.target.dataset?.tooltip}`);
-      Tooltip.instance.tooltipText = event.target.dataset.tooltip;
-      Tooltip.instance.render(event.clientX, event.clientY);
+      document.addEventListener('pointermove', this.pointerMove);
+      this.tooltipText = event.target.dataset.tooltip;
+      this.render(event.clientX, event.clientY);
     }
   };
 
-  pointerMove = function (event) {
-    if (event.target.dataset.tooltip) {
-      Tooltip.instance.element.style.left = `${event.clientX + Tooltip.deltaX}px`;
-      Tooltip.instance.element.style.top = `${event.clientY + Tooltip.deltaY}px`;
-    }
+  pointerMove = (event) => {
+    this.element.style.left = `${event.clientX + Tooltip.shift}px`;
+    this.element.style.top = `${event.clientY + Tooltip.shift}px`;
   };
 
-  pointerOut = function (event) {
-    if (event.target.dataset.tooltip) {
-      Tooltip.instance.destroy();
-    }
+  pointerOut = () => {
+    this.remove();
   };
 
   render(x = 0, y = 0) {
-    console.log('render');
     this.element = document.createElement("div");
     this.element.className = "tooltip";
     this.element.textContent = this.tooltipText;
     this.element.style.position = "absolute";
-    this.element.style.left = `${x + Tooltip.deltaX}px`;
-    this.element.style.top = `${y + Tooltip.deltaY}px`;
+    this.element.style.left = `${x + Tooltip.shift}px`;
+    this.element.style.top = `${y + Tooltip.shift}px`;
     document.body.append(this.element);
   }
 
-  destroy() {
+  remove() {
+    document.removeEventListener('pointermove', this.pointerMove);
     if (this.element) {
-      this.element.removeEventListener('pointerover', this.pointerOver);
-      this.element.removeEventListener('pointermove', this.pointerMove);
-      this.element.removeEventListener('pointerout', this.pointerOut);
+      this.element.remove();
+    }
+  }
+
+  destroy() {
+    document.removeEventListener('pointerover', this.pointerOver);
+    document.removeEventListener('pointermove', this.pointerMove);
+    document.removeEventListener('pointerout', this.pointerOut);
+    if (this.element) {
       this.element.remove();
       this.element = null;
     }
