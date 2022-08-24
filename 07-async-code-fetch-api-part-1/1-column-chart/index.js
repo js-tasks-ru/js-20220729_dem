@@ -29,63 +29,69 @@ export default class ColumnChart {
 
   render() {
     const columnChartWrapper = document.createElement('div');
-    columnChartWrapper.className = `column-chart ${this.hasData() > 0 ? '' : 'column-chart_loading'}`;
+    columnChartWrapper.className = `column-chart ${this.hasData() ? '' : 'column-chart_loading'}`;
     columnChartWrapper.style.cssText = `--chart-height: ${this.chartHeight}`;
-    columnChartWrapper.append(this.chartTitleWrapper());
-    columnChartWrapper.append(this.chartContainerWrapper());
+    columnChartWrapper.innerHTML = `
+    ${this.chartTitleWrapper()}
+    ${this.chartContainerWrapper()}
+    `;
 
     this.element = columnChartWrapper;
     this.subElements = this.getSubElements();
   }
 
   chartTitleWrapper() {
-    const titleWrapper = document.createElement('div');
-    titleWrapper.className = 'column-chart__title';
-    titleWrapper.innerHTML = `
-        ${this.label}
-        ${this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : ''}
+    return `
+      <div class="column-chart__title">
+      ${this.label}
+      ${this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : ''}
+      </div>
     `;
-
-    return titleWrapper;
   }
 
   chartContainerWrapper() {
-    const containerWrapper = document.createElement('div');
-    containerWrapper.className = 'column-chart__container';
-    containerWrapper.append(this.chartContainerHeader());
-    containerWrapper.append(this.chartContainerBody());
-
-    return containerWrapper;
+    return `
+      <div class="column-chart__container">
+      ${this.chartContainerHeader()}
+      ${this.chartContainerBody()}
+      </div>
+    `;
   }
 
   chartContainerHeader() {
-    const containerHeader = document.createElement('div');
-    containerHeader.className = 'column-chart__header';
-    containerHeader.setAttribute('data-element', 'header');
-    containerHeader.innerHTML = `${this.formatHeading(this.value)}`;
-
-    return containerHeader;
+    return `
+      <div class="column-chart__header" data-element="header">
+      ${this.formatHeading(this.value)}
+      </div>
+    `;
   }
 
   chartContainerBody() {
-    const containerBody = document.createElement('div');
-    containerBody.className = 'column-chart__chart';
-    containerBody.setAttribute('data-element', 'body');
-    containerBody.innerHTML = this.charts();
-
-    return containerBody;
+    return `
+      <div class="column-chart__chart" data-element="body">
+      ${this.renderCharts()}
+      </div>
+    `;
   }
 
-  charts() {
+  renderCharts() {
     if (this.hasData()) {
       return `
         ${this.dataRate()
         .map(({percent, value}) => `<div style="--value: ${value}" data-tooltip="${percent}"></div>`)
         .join('')}
-    `;
+      `;
     } else {
       return "";
     }
+  }
+
+  reRenderAsSkeleton() {
+    this.element.setAttribute("class", "column-chart column-chart_loading");
+  }
+
+  reRenderAsColumnChart() {
+    this.element.setAttribute("class", "column-chart");
   }
 
   dataRate() {
@@ -101,17 +107,22 @@ export default class ColumnChart {
 
   update(from, to) {
     this.range = {from: from, to: to};
-    return fetchJson(`${BACKEND_URL}/${this.url}?${this.queryParams()}`)
+    this.reRenderAsSkeleton();
+    return fetchJson(this.dataRequestUrl())
       .then(data => {
         this.data = data;
-        this.subElements.body.innerHTML = this.charts();
+        this.subElements.body.innerHTML = this.renderCharts();
         this.element.className = `column-chart ${this.hasData() ? '' : 'column-chart_loading'}`;
+        this.reRenderAsColumnChart();
         return this.data;
       });
   }
 
-  queryParams() {
-    return `from=${new Date(this.range.from).toISOString()}&to=${new Date(this.range.to).toISOString()}`;
+  dataRequestUrl() {
+    const dataRequestUrl = new URL(`${BACKEND_URL}/${this.url}`);
+    dataRequestUrl.searchParams.set("from", new Date(this.range.from).toISOString());
+    dataRequestUrl.searchParams.set("to", new Date(this.range.to).toISOString());
+    return dataRequestUrl;
   }
 
   hasData() {
@@ -135,7 +146,6 @@ export default class ColumnChart {
     this.element.remove();
   }
 
-  //todo: make a proper implementation
   destroy() {
     this.element.remove();
   }
