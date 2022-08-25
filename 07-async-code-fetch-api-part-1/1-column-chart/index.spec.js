@@ -62,6 +62,7 @@ describe('async-code-fetch-api-part-1/column-chart', () => {
     columnChart = new ColumnChart({ link });
 
     const columnLink = columnChart.element.querySelector('.column-chart__link');
+    document.body.append(columnChart.element); //otherwise toBeVisible() check is not passed
 
     expect(columnLink).toBeVisible();
   });
