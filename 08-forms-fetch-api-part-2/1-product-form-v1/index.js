@@ -97,9 +97,8 @@ export default class ProductForm {
         </option>`;
       }).join('\n')).join('\n')}
       `;
-    } else {
-      return "";
     }
+    return "";
   }
 
   productImagesContainerTemplate() {
@@ -172,7 +171,7 @@ export default class ProductForm {
     const url = new URL(CATEGORIES_PATH, BACKEND_URL);
     url.searchParams.set("_sort", "weight");
     url.searchParams.set("_refs", "subcategory");
-    return fetchJson(url)
+    return await fetchJson(url)
       .catch(reason => console.error(`Failed to fetch form categories: ${reason}`));
   }
 
@@ -216,23 +215,21 @@ export default class ProductForm {
   }
 
   async createProduct(jsonFormData) {
-    const url = new URL(PRODUCT_PATH, BACKEND_URL);
-    await fetchJson(url, {
-      method: 'POST',
-      body: jsonFormData
-    })
-      .then(_ => this.element.dispatchEvent(new Event("product-saved")))
-      .catch(reason => console.error(`Failed to create product: ${reason}`));
+    return this.productApiCall(jsonFormData, "POST", "product-created");
   }
 
   async updateProduct(jsonFormData) {
+    return this.productApiCall(jsonFormData, "PATCH", "product-updated");
+  }
+
+  async productApiCall(jsonFormData, method, event) {
     const url = new URL(PRODUCT_PATH, BACKEND_URL);
     await fetchJson(url, {
-      method: 'PATCH',
+      method: method,
       body: jsonFormData
     })
-      .then(_ => this.element.dispatchEvent(new Event("product-updated")))
-      .catch(reason => console.error(`Failed to update product: ${reason}`));
+      .then(_ => this.element.dispatchEvent(new Event(event)))
+      .catch(reason => console.error(`Failed to create product: ${reason}`));
   }
 
   clickUploadImage = (event) => {
