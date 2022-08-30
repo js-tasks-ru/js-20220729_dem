@@ -99,6 +99,7 @@ body {
 .sortable-list__item.sortable-list__item_dragging {
   position: fixed;
   max-width: 100%;
+  width: 100%;
   cursor: grabbing;
   border: 1px solid var(--blue);
   margin: 0;
