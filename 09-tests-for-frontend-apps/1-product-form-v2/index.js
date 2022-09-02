@@ -204,23 +204,6 @@ export default class ProductForm {
   };
 
   async save() {
-    const productFormData = this.subElements.productForm;
-    // console.log([...new FormData(this.subElements.productForm).entries()]);
-    // productFormData.id = this.productId;
-    // productFormData.images = []
-    // const jsonFormData = JSON.stringify(this.escapeHtmlValues(productFormData));
-    /*
-    formData = {
-    title: null,
-    description: null,
-    quantity: null,
-    subcategory: null,
-    status: null,
-    price: null,
-    discount: null,
-    images: []
-  };
-     */
     const formData = {};
 
     for (const prop in this.formData) {
