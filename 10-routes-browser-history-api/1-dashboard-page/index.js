@@ -46,7 +46,8 @@ export default class Page {
       new SortableTable(
         header,
         {
-          url: "api/dashboard/bestsellers"
+          url: "api/dashboard/bestsellers",
+          isSortLocally: true
         }
       ),
       new ColumnChart({
